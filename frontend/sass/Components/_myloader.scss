@@ -1,0 +1,71 @@
+@keyframes rotating {
+    from {
+        transform: rotate(0deg);
+        -o-transform: rotate(0deg);
+        -ms-transform: rotate(0deg);
+        -moz-transform: rotate(0deg);
+        -webkit-transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+        -o-transform: rotate(360deg);
+        -ms-transform: rotate(360deg);
+        -moz-transform: rotate(360deg);
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@-webkit-keyframes rotating {
+    from {
+        transform: rotate(0deg);
+        -webkit-transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+.rotating {
+    -webkit-animation: rotating 20s linear infinite;
+    -moz-animation: rotating 20s linear infinite;
+    -ms-animation: rotating 20s linear infinite;
+    -o-animation: rotating 20s linear infinite;
+    animation: rotating 20s linear infinite;
+}
+
+.progress {
+    width: 100%;
+    height: 10%;
+    background-color: lightgrey;
+    .value {
+        background-color: blue;
+        padding: 5px;
+        text-align: center;
+        color: white;
+        @for $value from 0 through 100 {
+            &.v-#{$value} {
+                width: $value * 1%;
+            }
+        }
+        &.striped {
+            background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.4) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0.4) 75%, transparent 75%, transparent);
+            background-size: 1rem 1rem;
+        }
+        &.animate {
+            @for $speed from 1 through 20 {
+                &.s-#{$speed} {
+                    animation: anim $speed+s infinite linear;
+                }
+            }
+        }
+        @keyframes anim {
+            from {
+                background-position: 0;
+            }
+            to {
+                background-position: -100%;
+            }
+        }
+    }
+}

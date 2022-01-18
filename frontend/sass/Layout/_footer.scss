@@ -1,0 +1,59 @@
+.bg-light text-center text-white {
+    padding: 20px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.container p-4 pb-0 {
+    display: flex;
+    padding: 10px;
+}
+
+.mb-4 {
+    display: flex;
+    width: 100%;
+    padding: 20px;
+    justify-content: center;
+}
+
+.m-1 {
+    padding: 9px;
+    margin: 5px;
+    border-radius: 80%;
+}
+
+.m-1-clock {
+    padding: 9px;
+    margin: 5px;
+    border-radius: 80%;
+    font-size: 28px;
+    color: red;
+}
+
+.p-3 {
+    border-radius: 20px;
+    text-align: center;
+    background: rgba(248, 247, 247, 0.801);
+}
+
+.footer {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.footer_propos {
+    display: flex;
+    width: 32%;
+}
+
+.footer_hebergement {
+    display: flex;
+    width: 32%;
+}
+
+.footer_assistance {
+    display: flex;
+    width: 32%;
+}

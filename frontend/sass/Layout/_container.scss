@@ -1,0 +1,88 @@
+            .conteneur {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                justify-content: center;
+            }
+            
+            .group {
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: space-evenly;
+                color: white;
+                margin: 0px auto;
+                &__header {
+                    font-size: 1.2rem;
+                    align-items: center;
+                    color: white;
+                    padding: 1rem;
+                    border-radius: 2rem;
+                    background-color: rgb(35, 49, 82);
+                    &__body {
+                        padding: 1rem;
+                        background-color: #d4d4d4;
+                        border-radius: 2rem;
+                        margin-top: 1rem;
+                        margin-bottom: 1rem;
+                        color: #071b46;
+                        &__first {
+                            height: 100%;
+                            margin: 5px;
+                            margin-bottom: 1rem;
+                            &__in {
+                                font-size: 10px;
+                            }
+                            &__down {
+                                font-size: 10px;
+                                background-color: white;
+                            }
+                        }
+                        &__second {
+                            height: 100%;
+                            margin: 5px;
+                            margin-bottom: 1rem;
+                        }
+                        &__btn {
+                            border: 1px solid#ececec;
+                            border-radius: 5px;
+                            outline: 0;
+                            background-color: #ececec;
+                            font-size: 1rem;
+                            padding: 3px 6px 3px 6px;
+                            transform: scale(1);
+                            transition: transform 330ms ease-in-out;
+                            &:hover {
+                                background-color: white;
+                                Transform: scale(1.1);
+                                border: solid 1px black;
+                            }
+                        }
+                        input {
+                            background-color: #d4d4d4;
+                            &:hover {
+                                background-color: white;
+                                // Transform: scale(1.1);
+                                border: solid 1px black;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            .btn-1 {
+                border: 1px solid#ececec;
+                border-radius: 5px;
+                outline: 0;
+                background-color: #ececec;
+                font-size: 1rem;
+                padding: 3px 6px 3px 6px;
+                transform: scale(1);
+                transition: transform 330ms ease-in-out;
+                border: solid 1px black;
+                &:hover {
+                    background-color: #e04151;
+                    Transform: scale(1.1);
+                    border: solid 1px red;
+                }
+            }
