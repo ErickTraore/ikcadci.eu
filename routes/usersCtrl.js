@@ -17,6 +17,37 @@ const PASSWORD_REGEX = /^(?=.*\d).{4,8}$/;
 
 
 module.exports = {
+    // testEmail: function(req, res) {
+
+
+
+    //     asyncLib.waterfall([
+    //         function(done) {
+    //             models.User.findOne({
+    //                     attributes: [this.user.email],
+    //                     where: { email: this.user.email }
+    //                 })
+    //                 .then(function(userFound) {
+    //                     done(null, userFound);
+    //                 })
+    //                 .catch(function(err) {
+    //                     return res.status(500).json({ 'error': 'unable to verify user' });
+    //                 });
+    //         },
+    //         function(userFound, done) {
+    //             if (userFound) {
+    //                 this.errors.push('L\'adresse email est invalide.');
+
+    //             }
+    //         }
+    //     ])
+    // },
+
+
+
+
+
+
     register: function(req, res) {
 
         // Params

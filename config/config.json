@@ -1,22 +1,22 @@
 {
     "development": {
-        "username": "tde",
-        "password": "Erick2691",
-        "database": "dbDaouda_development",
+        "username": "root",
+        "password": "72jE_b_Bqi",
+        "database": "ikcadci_development",
         "host": "127.0.0.1",
         "dialect": "mysql"
     },
     "test": {
-        "username": "tde",
-        "password": "Erick2691",
-        "database": "dbDaouda_test",
+        "username": "root",
+        "password": "72jE_b_Bqi",
+        "database": "ikcadci_test",
         "host": "127.0.0.1",
         "dialect": "mysql"
     },
     "production": {
-        "username": "tde",
-        "password": "Erick2691",
-        "database": "dbDaouda_production",
+        "username": "root",
+        "password": "72jE_b_Bqi",
+        "database": "ikcadci_production",
         "host": "127.0.0.1",
         "dialect": "mysql"
     }
