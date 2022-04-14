@@ -27,6 +27,7 @@ module.exports = {
         var titleSecond = req.body.titleSecond;
         var duration = req.body.duration;
         var niveau = req.body.niveau;
+        var href = req.body.href;
         var isActive = req.body.isActive;
         var attachment = req.body.attachment;
         if (attachment == null || titleFirst == null || titleSecond == null || niveau == null) {
@@ -58,6 +59,7 @@ module.exports = {
                             attachment: attachment || null,
                             niveau: niveau,
                             duration: duration,
+                            href: href,
                             isActive: isActive,
                             UserId: userFound.id
                         })
@@ -335,7 +337,7 @@ module.exports = {
         var size = file.data.length;
         var extension = path.extname(fileName);
 
-        var allowedExtensions = /png|jpeg|jpg|gif/;
+        var allowedExtensions = /png|jpeg|jpg|pdf|gif/;
         const md5 = file.md5;
         const URL = "/formations/images/" + md5 + extension;
         const idImage = md5 + extension;

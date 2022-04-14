@@ -88,8 +88,8 @@ server.use(express.static('public'));
 server.use('/api/', apiRouter);
 
 httpServer.listen(3001, function() {
-    console.log('Server en écoute :');
+    console.log('Server en écoute sur http:');
 });
 httpsServer.listen(3000, function() {
-    console.log('Server en écoute :');
+    console.log('Server en écoute sur https:');
 });

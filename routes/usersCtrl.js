@@ -3,6 +3,7 @@ var bcrypt = require('bcrypt');
 var jwtUtils = require('../utils/jwt.utils');
 var models = require('../models');
 var asyncLib = require('async');
+const { log } = require('console');
 
 const TITLE_LIMIT = 2;
 const CONTENT_LIMIT = 4;
@@ -17,37 +18,29 @@ const PASSWORD_REGEX = /^(?=.*\d).{4,8}$/;
 
 
 module.exports = {
-    // testEmail: function(req, res) {
-
-
-
-    //     asyncLib.waterfall([
-    //         function(done) {
-    //             models.User.findOne({
-    //                     attributes: [this.user.email],
-    //                     where: { email: this.user.email }
-    //                 })
-    //                 .then(function(userFound) {
-    //                     done(null, userFound);
-    //                 })
-    //                 .catch(function(err) {
-    //                     return res.status(500).json({ 'error': 'unable to verify user' });
-    //                 });
-    //         },
-    //         function(userFound, done) {
-    //             if (userFound) {
-    //                 this.errors.push('L\'adresse email est invalide.');
-
-    //             }
-    //         }
-    //     ])
-    // },
-
-
-
-
-
-
+    verificationEmail: function(req, res) {
+        // Params
+        var email = req.body.email;
+        asyncLib.waterfall([
+                function(done) {
+                    models.User.findOne({
+                            attributes: ['email'],
+                            where: { email: email }
+                        })
+                        .then(function(userFound) {
+                            done(null, userFound);
+                        })
+                        .catch(function(err) {
+                            return res.status(500).json({ 'error': 'unable to verify user-verification' });
+                        });
+                },
+            ]),
+            function(userFound) {
+                if (userFound) {
+                    return res.status(200).json({ 'testEmail': true });
+                }
+            }
+    },
     register: function(req, res) {
 
         // Params
@@ -78,53 +71,56 @@ module.exports = {
         }
 
         asyncLib.waterfall([
-            function(done) {
-                models.User.findOne({
-                        attributes: ['email'],
-                        where: { email: email }
-                    })
-                    .then(function(userFound) {
-                        done(null, userFound);
-                    })
-                    .catch(function(err) {
-                        return res.status(500).json({ 'error': 'unable to verify user' });
-                    });
-            },
-            function(userFound, done) {
-                if (!userFound) {
-                    bcrypt.hash(password, 5, function(err, bcryptedPassword) {
-                        done(null, userFound, bcryptedPassword);
+                function(done) {
+                    models.User.findOne({
+                            attributes: ['email'],
+                            where: { email: email }
+                        })
+                        .then(function(userFound) {
+                            done(null, userFound);
+                        })
+                        .catch(function(err) {
+                            return res.status(500).json({ 'error': 'unable to verify user-register' });
+                        });
+                },
+                function(userFound, done) {
+                    if (!userFound) {
+                        bcrypt.hash(password, 5, function(err, bcryptedPassword) {
+                            done(null, userFound, bcryptedPassword);
+                        });
+                    } else {
+                        return res.status(409).json({
+                            error: 'user already exist '
+                        });
+                    }
+                },
+                function(userFound, bcryptedPassword, done) {
+                    var newUser = models.User.create({
+                            email: email,
+                            username: username,
+                            password: bcryptedPassword,
+                            bio: bio,
+                            isAdmin: 0
+                        })
+                        .then(function(newUser) {
+                            done(newUser);
+                        })
+                        .catch(function(err) {
+                            return res.status(500).json({ 'error': 'cannot add user' });
+                        });
+                }
+            ],
+            function(newUser) {
+                if (newUser) {
+                    const $token = jwtUtils.generateTokenForUser(newUser);
+                    return res.status(201).json({
+                        '$userId': newUser.id,
+                        $token,
                     });
                 } else {
-                    return res.status(409).json({ 'error': 'user already exist' });
+                    return res.status(500).json({ 'error': 'cannot add user' });
                 }
-            },
-            function(userFound, bcryptedPassword, done) {
-                var newUser = models.User.create({
-                        email: email,
-                        username: username,
-                        password: bcryptedPassword,
-                        bio: bio,
-                        isAdmin: 0
-                    })
-                    .then(function(newUser) {
-                        done(newUser);
-                    })
-                    .catch(function(err) {
-                        return res.status(500).json({ 'error': 'cannot add user' });
-                    });
-            }
-        ], function(newUser) {
-            if (newUser) {
-                const $token = jwtUtils.generateTokenForUser(newUser);
-                return res.status(201).json({
-                    '$userId': newUser.id,
-                    $token,
-                });
-            } else {
-                return res.status(500).json({ 'error': 'cannot add user' });
-            }
-        });
+            });
     },
     login: function(req, res, next) {
 
