@@ -18,36 +18,32 @@ const PASSWORD_REGEX = /^(?=.*\d).{4,8}$/;
 
 
 module.exports = {
-    verificationEmail: function(req, res) {
-        // Params
-        var email = req.body.email;
-        asyncLib.waterfall([
-                function(done) {
-                    models.User.findOne({
-                            attributes: ['email'],
-                            where: { email: email }
-                        })
-                        .then(function(userFound) {
-                            done(null, userFound);
-                        })
-                        .catch(function(err) {
-                            return res.status(500).json({ 'error': 'unable to verify user-verification' });
-                        });
-                },
-            ]),
-            function(userFound) {
-                if (userFound) {
-                    return res.status(200).json({ 'testEmail': true });
-                }
-            }
-    },
+
     register: function(req, res) {
 
         // Params
         var email = req.body.email;
         var username = req.body.username;
         var password = req.body.password;
-        var bio = req.body.bio;
+        var biographie = req.body.biographie;
+        var lastname = req.body.lastname;
+        var usernameTradition = req.body.usernameTradition;
+        var lastnameTradition = req.body.lastnameTradition;
+        var dateBirthday = req.body.dateBirthday;
+        var townBirthday = req.body.townBirthday;
+        var sexe = req.body.sexe;
+        var nationalite = req.body.nationalite;
+        var adresseResid = req.body.adresseResid;
+        var villeResid = req.body.villeResid;
+        var paysResid = req.body.paysResid;
+        var tel1 = req.body.tel1;
+        var tel2 = req.body.tel2;
+        var tel3 = req.body.tel3;
+        var picked = req.body.picked;
+        var seshsw = req.body.seshsw;
+        var seshswNsw = req.body.seshswNsw;
+        var seba = req.body.seba;
+
 
         if (email == null) {
             return res.status(400).json({ 'error': 'email missing parameters' });
@@ -99,7 +95,24 @@ module.exports = {
                             email: email,
                             username: username,
                             password: bcryptedPassword,
-                            bio: bio,
+                            biographie: biographie,
+                            lastname: lastname,
+                            usernameTradition: usernameTradition,
+                            lastnameTradition: lastnameTradition,
+                            dateBirthday: dateBirthday,
+                            townBirthday: townBirthday,
+                            sexe: sexe,
+                            nationalite: nationalite,
+                            adresseResid: adresseResid,
+                            villeResid: villeResid,
+                            paysResid: paysResid,
+                            tel1: tel1,
+                            tel2: tel2,
+                            tel3: tel3,
+                            picked: picked,
+                            seshsw: seshsw,
+                            seshswNsw: seshswNsw,
+                            seba: seba,
                             isAdmin: 0
                         })
                         .then(function(newUser) {
@@ -186,7 +199,7 @@ module.exports = {
             return res.status(201).json({ testUser });
         } else {
             models.User.findOne({
-                attributes: ['id', 'email', 'username', 'bio', 'isAdmin'],
+                attributes: ['id', 'email', 'username', 'biographie', 'isAdmin', 'lastname', 'usernameTradition', 'lastnameTradition', 'dateBirthday', 'townBirthday', 'nationalite', 'sexe', 'adresseResid', 'villeResid', 'paysResid', 'tel1', 'tel2', 'tel3', 'picked', 'seshsw', 'seshswNsw', 'seba'],
                 where: { id: userId }
             }).then(function(user) {
                 if (user) {
@@ -205,39 +218,75 @@ module.exports = {
         var userId = jwtUtils.getUserId(headerAuth);
 
         // Params
-        var bio = req.body.bio;
+        var biographie = req.body.biographie;
+        var lastname = req.body.lastname;
+        var usernameTradition = req.body.usernameTradition;
+        var lastnameTradition = req.body.lastnameTradition;
+        var dateBirthday = req.body.dateBirthday;
+        var townBirthday = req.body.townBirthday;
+        var sexe = req.body.sexe;
+        var nationalite = req.body.nationalite;
+        var adresseResid = req.body.adresseResid;
+        var villeResid = req.body.villeResid;
+        var paysResid = req.body.paysResid;
+        var tel1 = req.body.tel1;
+        var tel2 = req.body.tel2;
+        var tel3 = req.body.tel3;
+        var picked = req.body.picked;
+        var seshsw = req.body.seshsw;
+        var seshswNsw = req.body.seshswNsw;
+        var seba = req.body.seba;
         asyncLib.waterfall([
-            function(done) {
-                models.User.findOne({
-                        attributes: ['id', 'bio'],
-                        where: { id: userId }
-                    }).then(function(userFound) {
-                        done(null, userFound);
-                    })
-                    .catch(function(err) {
-                        return res.status(500).json({ 'error': 'unable to verify user' });
-                    });
-            },
-            function(userFound, done) {
+                function(done) {
+                    models.User.findOne({
+                            attributes: ['id', 'biographie', 'lastname', 'usernameTradition', 'lastnameTradition', 'dateBirthday', 'townBirthday', 'sexe', 'nationalite', 'adresseResid', 'villeResid', 'paysResid', 'tel1', 'tel2', 'tel3', 'picked', 'seshsw', 'seshswNsw', 'seba'],
+                            where: { id: userId }
+                        }).then(function(userFound) {
+                            done(null, userFound);
+                        })
+                        .catch(function(err) {
+                            return res.status(500).json({ 'error': 'unable to verify user' });
+                        });
+                },
+                function(userFound, done) {
+                    if (userFound) {
+                        userFound.update({
+                            biographie: (biographie ? biographie : userFound.biographie),
+                            lastname: (lastname ? lastname : userFound.lastname),
+                            usernameTradition: (usernameTradition ? usernameTradition : userFound.usernameTradition),
+                            lastnameTradition: (lastnameTradition ? lastnameTradition : userFound.lastnameTradition),
+                            dateBirthday: (dateBirthday ? dateBirthday : userFound.dateBirthday),
+                            townBirthday: (townBirthday ? townBirthday : userFound.townBirthday),
+                            sexe: (sexe ? sexe : userFound.sexe),
+                            nationalite: (nationalite ? nationalite : userFound.nationalite),
+                            adresseResid: (adresseResid ? adresseResid : userFound.adresseResid),
+                            villeResid: (villeResid ? villeResid : userFound.villeResid),
+                            paysResid: (paysResid ? paysResid : userFound.paysResid),
+                            tel1: (tel1 ? tel1 : userFound.tel1),
+                            tel2: (tel2 ? tel2 : userFound.tel2),
+                            tel3: (tel3 ? tel3 : userFound.tel3),
+                            picked: (picked ? picked : userFound.picked),
+                            seshsw: (seshsw ? seshsw : userFound.seshsw),
+                            seshswNsw: (seshswNsw ? seshswNsw : userFound.seshswNsw),
+                            seba: (seba ? seba : userFound.seba),
+
+                        }).then(function() {
+                            done(userFound);
+                        }).catch(function(err) {
+                            res.status(500).json({ 'error': 'cannot update user' });
+                        });
+                    } else {
+                        res.status(404).json({ 'error': 'user not found' });
+                    }
+                },
+            ],
+            function(userFound) {
                 if (userFound) {
-                    userFound.update({
-                        bio: (bio ? bio : userFound.bio)
-                    }).then(function() {
-                        done(userFound);
-                    }).catch(function(err) {
-                        res.status(500).json({ 'error': 'cannot update user' });
-                    });
+                    return res.status(201).json(userFound);
                 } else {
-                    res.status(404).json({ 'error': 'user not found' });
+                    return res.status(500).json({ 'error': 'cannot update user profile' });
                 }
-            },
-        ], function(userFound) {
-            if (userFound) {
-                return res.status(201).json(userFound);
-            } else {
-                return res.status(500).json({ 'error': 'cannot update user profile' });
-            }
-        });
+            });
     },
     listUsers: function(req, res) {
         var fields = req.query.fields;
