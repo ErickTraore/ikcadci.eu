@@ -1,9 +1,10 @@
 // Imports
-var express = require('express');
-var usersCtrl = require('./routes/usersCtrl');
-var messagesCtrl = require('./routes/messagesCtrl');
-var formationsCtrl = require('./routes/formationsCtrl');
-var likesCtrl = require('./routes/likesCtrl');
+const express = require('express');
+const usersCtrl = require('./routes/usersCtrl');
+const messagesCtrl = require('./routes/messagesCtrl');
+const formationsCtrl = require('./routes/formationsCtrl');
+const inscriptionsCtrl = require('./routes/inscriptionsCtrl');
+const likesCtrl = require('./routes/likesCtrl');
 const auth = require('./middleware/auth');
 const router = express.Router();
 
@@ -13,12 +14,14 @@ exports.router = (function() {
     var router = express.Router();
     // Users routes
     // router.post('/users/verifEmail/', usersCtrl.verificationEmail);
+    router.get('/users/', usersCtrl.listUsers);
+    router.get('/users/me/', auth, usersCtrl.getUserProfile);
     router.post('/users/register/', usersCtrl.register);
     router.post('/users/login/', usersCtrl.login);
-    router.get('/users/me/', usersCtrl.getUserProfile);
+    router.get('/users/classroom/', usersCtrl.classroom);
     router.post('/users/delProfil/', usersCtrl.destroyProfil);
-    router.get('/users/', usersCtrl.listUsers);
     router.post('/users/:userId/del', usersCtrl.destroyUser);
+    router.get('/users/:userId/read', usersCtrl.readUser);
     // router.post('/users/:userId/delMe', usersCtrl.delMeUser);
     router.put('/users/me/', usersCtrl.updateUserProfile);
 
@@ -36,6 +39,9 @@ exports.router = (function() {
     router.get('/formations/', formationsCtrl.listFormations);
     router.post("/formations/upload", formationsCtrl.uploadImage);
     router.post('/formations/new/', formationsCtrl.createFormation);
+
+    router.post('/inscriptions/new/', inscriptionsCtrl.createInscription);
+    router.get('/listInscriptions/list/', inscriptionsCtrl.listInscriptions);
 
     return router;
 

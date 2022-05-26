@@ -33,6 +33,8 @@ module.exports = (sequelize, DataTypes) => {
         seshsw: DataTypes.STRING,
         seshswNsw: DataTypes.STRING,
         seba: DataTypes.STRING,
+        acceptOne: DataTypes.BOOLEAN,
+        acceptTwo: DataTypes.BOOLEAN,
     }, {
         sequelize,
         modelName: 'User',

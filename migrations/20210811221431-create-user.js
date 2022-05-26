@@ -101,6 +101,14 @@ module.exports = {
                 type: Sequelize.STRING
             },
 
+            acceptOne: {
+                allowNull: true,
+                type: Sequelize.BOOLEAN
+            },
+            acceptTwo: {
+                allowNull: true,
+                type: Sequelize.BOOLEAN
+            },
             isAdmin: {
                 allowNull: false,
                 type: Sequelize.BOOLEAN

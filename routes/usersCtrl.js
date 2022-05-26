@@ -43,6 +43,10 @@ module.exports = {
         var seshsw = req.body.seshsw;
         var seshswNsw = req.body.seshswNsw;
         var seba = req.body.seba;
+        var profession = req.body.profession;
+        var activite = req.body.activite;
+        var acceptOne = req.body.acceptOne;
+        var acceptTwo = req.body.acceptTwo;
 
 
         if (email == null) {
@@ -113,6 +117,8 @@ module.exports = {
                             seshsw: seshsw,
                             seshswNsw: seshswNsw,
                             seba: seba,
+                            profession: profession,
+                            activite: activite,
                             isAdmin: 0
                         })
                         .then(function(newUser) {
@@ -194,12 +200,9 @@ module.exports = {
         var headerAuth = req.headers['authorization'];
         var userId = jwtUtils.getUserId(headerAuth);
 
-        if (userId < 0) {
-            var testUser = 'testOk'
-            return res.status(201).json({ testUser });
-        } else {
+        if (userId > 0) {
             models.User.findOne({
-                attributes: ['id', 'email', 'username', 'biographie', 'isAdmin', 'lastname', 'usernameTradition', 'lastnameTradition', 'dateBirthday', 'townBirthday', 'nationalite', 'sexe', 'adresseResid', 'villeResid', 'paysResid', 'tel1', 'tel2', 'tel3', 'picked', 'seshsw', 'seshswNsw', 'seba'],
+                attributes: ['id', 'email', 'username', 'biographie', 'isAdmin', 'lastname', 'usernameTradition', 'lastnameTradition', 'dateBirthday', 'townBirthday', 'nationalite', 'sexe', 'adresseResid', 'villeResid', 'paysResid', 'tel1', 'tel2', 'tel3', 'picked', 'seshsw', 'seshswNsw', 'seba', 'profession', 'activite', 'acceptOne', 'acceptTwo'],
                 where: { id: userId }
             }).then(function(user) {
                 if (user) {
@@ -236,10 +239,14 @@ module.exports = {
         var seshsw = req.body.seshsw;
         var seshswNsw = req.body.seshswNsw;
         var seba = req.body.seba;
+        var profession = req.body.profession;
+        var activite = req.body.activite;
+        var acceptOne = req.body.acceptOne;
+        var acceptTwo = req.body.acceptTwo;
         asyncLib.waterfall([
                 function(done) {
                     models.User.findOne({
-                            attributes: ['id', 'biographie', 'lastname', 'usernameTradition', 'lastnameTradition', 'dateBirthday', 'townBirthday', 'sexe', 'nationalite', 'adresseResid', 'villeResid', 'paysResid', 'tel1', 'tel2', 'tel3', 'picked', 'seshsw', 'seshswNsw', 'seba'],
+                            attributes: ['id', 'biographie', 'lastname', 'usernameTradition', 'lastnameTradition', 'dateBirthday', 'townBirthday', 'sexe', 'nationalite', 'adresseResid', 'villeResid', 'paysResid', 'tel1', 'tel2', 'tel3', 'picked', 'seshsw', 'seshswNsw', 'seba', 'profession', 'activite', 'acceptOne', 'acceptTwo'],
                             where: { id: userId }
                         }).then(function(userFound) {
                             done(null, userFound);
@@ -269,6 +276,10 @@ module.exports = {
                             seshsw: (seshsw ? seshsw : userFound.seshsw),
                             seshswNsw: (seshswNsw ? seshswNsw : userFound.seshswNsw),
                             seba: (seba ? seba : userFound.seba),
+                            profession: (profession ? profession : userFound.profession),
+                            activite: (activite ? activite : userFound.activite),
+                            acceptOne: (acceptOne ? acceptOne : userFound.acceptOne),
+                            acceptTwo: (acceptTwo ? acceptTwo : userFound.acceptTwo),
 
                         }).then(function() {
                             done(userFound);
@@ -364,6 +375,35 @@ module.exports = {
         });
 
     },
+    readUser: function(req, res) {
+        var headerAuth = req.headers['authorization'];
+        var userId = jwtUtils.getUserId(headerAuth);
+        var readId = -1;
+        console.log('Utilisateur', userId);
+        console.log(headerAuth);
+
+        // Params
+        var readId = parseInt(req.params.userId);
+        console.log('readId', readId);
+
+        if (readId <= 0) {
+            return res.status(400).json({ 'error': 'invalid read parameters' });
+        }
+        models.User.findOne({
+            where: {
+                id: readId
+            }
+        }).then(function(userRead) {
+            if (userRead) {
+                res.status(200).json(userRead);
+            } else {
+                res.status(404).json({ "error": "no users found" });
+            }
+        }).catch(function(err) {
+            res.status(500).json({ "error": "invalid fields" });
+        });
+
+    },
 
     destroyProfil: function(req, res) {
         var headerAuth = req.headers['authorization'];
@@ -409,5 +449,28 @@ module.exports = {
                 }
             },
         )
+    },
+    classroom: function(req, res) {
+        // Getting auth header
+        var headerAuth = req.headers['authorization'];
+        var userId = jwtUtils.getUserId(headerAuth);
+
+        if (userId < 0) {
+            var testUser = 'testOk'
+            return res.status(201).json({ testUser });
+        } else {
+            models.User.findOne({
+                attributes: ['id', 'email', 'username', 'biographie', 'isAdmin', 'lastname', 'usernameTradition', 'lastnameTradition', 'dateBirthday', 'townBirthday', 'nationalite', 'sexe', 'adresseResid', 'villeResid', 'paysResid', 'tel1', 'tel2', 'tel3', 'picked', 'seshsw', 'seshswNsw', 'seba', 'profession', 'activite', 'acceptOne', 'acceptTwo'],
+                where: { id: userId }
+            }).then(function(user) {
+                if (user) {
+                    res.status(201).json(user);
+                } else {
+                    res.status(405).json({ 'error': 'user not found' });
+                }
+            }).catch(function(err) {
+                res.status(500).json({ 'error': 'cannot fetch user' });
+            });
+        }
     }
 }
