@@ -17,7 +17,7 @@ const ITEMS_LIMIT = 50;
 
 // Routes
 module.exports = {
-    createMessage: function(req, res) {
+    createPiece: function(req, res) {
         // Getting auth header
         console.log(req);
         var headerAuth = req.headers['authorization'];
@@ -50,7 +50,7 @@ module.exports = {
             },
             function(userFound, done) {
                 if (userFound) {
-                    models.Message.create({
+                    models.Piece.create({
                             title: title,
                             content: content,
                             attachment: attachment || null,
@@ -58,22 +58,22 @@ module.exports = {
                             dislikes: 0,
                             UserId: userFound.id
                         })
-                        .then(function(newMessage) {
-                            done(newMessage);
+                        .then(function(newPiece) {
+                            done(newPiece);
                         });
                 } else {
                     res.status(404).json({ 'error': 'user not found' });
                 }
             },
-        ], function(newMessage) {
-            if (newMessage) {
-                return res.status(201).json(newMessage);
+        ], function(newPiece) {
+            if (newPiece) {
+                return res.status(201).json(newPiece);
             } else {
-                return res.status(500).json({ 'error': 'cannot post message' });
+                return res.status(500).json({ 'error': 'cannot post piece' });
             }
         });
     },
-    listMessages: function(req, res) {
+    listPieces: function(req, res) {
         var fields = req.query.fields;
         var limit = parseInt(req.query.limit);
         var offset = parseInt(req.query.offset);
@@ -83,7 +83,7 @@ module.exports = {
             limit = ITEMS_LIMIT;
         }
 
-        models.Message.findAll({
+        models.Piece.findAll({
             order: [(order != null) ? order.split(':') : ['title', 'ASC']],
             attributes: (fields !== '*' && fields != null) ? fields.split(',') : null,
             limit: (!isNaN(limit)) ? limit : null,
@@ -95,17 +95,17 @@ module.exports = {
             order: [
                 ['id', 'DESC']
             ],
-        }).then(function(messages) {
-            if (messages) {
-                res.status(200).json(messages);
+        }).then(function(pieces) {
+            if (pieces) {
+                res.status(200).json(pieces);
             } else {
-                res.status(404).json({ "error": "no messages found" });
+                res.status(404).json({ "error": "no pieces found" });
             }
         }).catch(function(err) {
             res.status(500).json({ "error": "invalid fields" });
         });
     },
-    listMessagesAdmin: function(req, res) {
+    listPiecesAdmin: function(req, res) {
         var fields = req.query.fields;
         var limit = parseInt(req.query.limit);
         var offset = parseInt(req.query.offset);
@@ -115,7 +115,7 @@ module.exports = {
             limit = ITEMS_LIMIT;
         }
 
-        models.Message.findAll({
+        models.Piece.findAll({
             order: [(order != null) ? order.split(':') : ['title', 'ASC']],
             attributes: (fields !== '*' && fields != null) ? fields.split(',') : null,
             limit: (!isNaN(limit)) ? limit : null,
@@ -127,17 +127,17 @@ module.exports = {
             order: [
                 ['id', 'DESC']
             ],
-        }).then(function(messages) {
-            if (messages) {
-                res.status(200).json(messages);
+        }).then(function(pieces) {
+            if (pieces) {
+                res.status(200).json(pieces);
             } else {
-                res.status(404).json({ "error": "no messages found" });
+                res.status(404).json({ "error": "no pieces found" });
             }
         }).catch(function(err) {
             res.status(500).json({ "error": "invalid fields" });
         });
     },
-    delMessPost: function(req, res) {
+    delPiecePost: function(req, res) {
         // Getting auth header
         var headerAuth = req.headers['authorization'];
         var userId = jwtUtils.getUserId(headerAuth);
@@ -146,15 +146,15 @@ module.exports = {
         console.log(headerAuth);
 
         // Params
-        var messageId = parseInt(req.params.messageId);
-        console.log('message.id', messageId);
+        var pieceId = parseInt(req.params.pieceId);
+        console.log('piece.id', pieceId);
 
-        if (messageId <= 0) {
+        if (pieceId <= 0) {
             return res.status(400).json({ 'error': 'invalid parameters' });
         }
 
         asyncLib.waterfall([
-                // on charge le message concerné dans la variable messageFound..
+                // on charge le piece concerné dans la variable pieceFound..
                 function(done) {
                     models.User.findOne({
                             where: {
@@ -171,80 +171,69 @@ module.exports = {
                 function(userLive, done) {
                     if (userLive) {
 
-                        models.Message.findOne({
+                        models.Piece.findOne({
                                 where: {
-                                    id: messageId,
+                                    id: pieceId,
                                 }
                             })
-                            .then(function(messageLive) {
-                                done(null, messageLive, userLive);
+                            .then(function(pieceLive) {
+                                done(null, pieceLive, userLive);
                             })
                             .catch(function(error) {
-                                return res.status(500).json({ 'error': 'is not the owner message' });
+                                return res.status(500).json({ 'error': 'is not the owner piece' });
                             });
                     } else {
-                        return res.status(201).json({ 'error': 'You are not the owner message' });
+                        return res.status(201).json({ 'error': 'You are not the owner piece' });
                     }
 
                 },
-                function(messageLive, userLive, done) {
-                    console.log('messageLive.UserId :', messageLive)
+                function(pieceLive, userLive, done) {
+                    console.log('pieceLive.UserId :', pieceLive)
                     console.log('userId', userId)
-                    console.log('messageLive.UserId :', messageLive.UserId)
-                    console.log('messageLive.Likes :', messageLive.likes)
-                    console.log('messageLive.Dislikes :', messageLive.dislikes)
-                    console.log('messageLive.id :', messageId)
-                    if (messageLive.UserId = userId) {
-                        messageLive.update({
-                            likes: messageLive.likes * 0,
-                            dislikes: messageLive.dislike * 0,
+                    console.log('pieceLive.UserId :', pieceLive.UserId)
+                    console.log('pieceLive.Likes :', pieceLive.likes)
+                    console.log('pieceLive.Dislikes :', pieceLive.dislikes)
+                    console.log('pieceLive.id :', pieceId)
+                    if (pieceLive.UserId = userId) {
+                        pieceLive.update({
+                            likes: pieceLive.likes * 0,
+                            dislikes: pieceLive.dislike * 0,
                         }).then(function() {
-                            done(messageLive);
+                            done(pieceLive);
                         }).catch(function(err) {
                             res.status(500).json({ 'error': 'cannot update likes=0 and dislike=0' });
                         });
-                        models.Like.destroy({
+
+                        models.Piece.destroy({
                                 where: {
-                                    messageId: messageId,
+                                    id: pieceId,
                                 }
                             })
-                            .then(function(newLike) {
+                            .then(function(destroyPiece) {
                                 // return res.status(200).json({ deleteLikeLive });
-                                done(newLike)
+                                done(destroyPiece)
                             })
                             .catch(function(error) {
-                                return res.status(502).json({ 'error': 'unable to delete like' });
-                            });
-                        models.Message.destroy({
-                                where: {
-                                    id: messageId,
-                                }
-                            })
-                            .then(function(destroyMessage) {
-                                // return res.status(200).json({ deleteLikeLive });
-                                done(destroyMessage)
-                            })
-                            .catch(function(error) {
-                                return res.status(502).json({ 'error': 'unable to delete like' });
+                                return res.status(502).json({ 'error': 'unable to delete piece' });
                             });
 
 
                     } else {
-                        res.status(404).json({ 'error': 'unable to load message found' });
+                        res.status(404).json({ 'error': 'unable to load piece found' });
                     }
                 },
             ],
-            function(destroyMessage) {
-                if (destroyMessage) {
-                    return res.status(201).json('message delete');
+            function(destroyPiece) {
+                if (destroyPiece) {
+                    return res.status(201).json('piece delete');
                 } else {
-                    return res.status(500).json({ 'error': 'cannot delete message' });
+                    return res.status(500).json({ 'error': 'cannot delete piece' });
                 }
             }
 
         );
     },
-    delMessPostAdmin: function(req, res) {
+    delPiecePostAdmin: function(req, res) {
         // Getting auth header
         var headerAuth = req.headers['authorization'];
         var userId = jwtUtils.getUserId(headerAuth);
@@ -252,10 +241,10 @@ module.exports = {
         console.log(headerAuth);
 
         // Params
-        var messageId = parseInt(req.params.messageId);
-        console.log('message.id', messageId);
+        var messageId = parseInt(req.params.pieceId);
+        console.log('piece.id', pieceId);
 
-        if (messageId <= 0) {
+        if (pieceId <= 0) {
             return res.status(400).json({ 'error': 'invalid parameters' });
         }
 
@@ -277,46 +266,46 @@ module.exports = {
                 function(userLive, done) {
                     if (userLive) {
 
-                        models.Message.findOne({
+                        models.Piece.findOne({
                                 where: {
-                                    id: messageId,
+                                    id: pieceId,
                                 }
                             })
-                            .then(function(messageLive) {
-                                done(null, messageLive, userLive);
+                            .then(function(pieceLive) {
+                                done(null, pieceLive, userLive);
                             })
                             .catch(function(error) {
-                                return res.status(502).json({ 'error': 'is not the owner message' });
+                                return res.status(502).json({ 'error': 'is not the owner piece' });
                             });
                     } else {
-                        return res.status(201).json({ 'error': 'You are not the owner message' });
+                        return res.status(201).json({ 'error': 'You are not the owner piece' });
                     }
 
                 },
-                function(messageLive, userLive, done) {
-                    if (messageLive) {
-                        models.Message.destroy({
+                function(pieceLive, userLive, done) {
+                    if (pieceLive) {
+                        models.Piece.destroy({
                                 where: {
-                                    id: messageId,
+                                    id: pieceId,
                                 }
                             })
-                            .then(function(destroyMessage) {
+                            .then(function(destroyPiece) {
                                 // return res.status(200).json({ deleteLikeLive });
-                                done(destroyMessage)
+                                done(destroyPiece)
                             })
                             .catch(function(error) {
-                                return res.status(404).json({ 'error': 'unable to destroy message' });
+                                return res.status(404).json({ 'error': 'unable to destroy piece' });
                             });
                     } else {
-                        res.status(404).json({ 'error': 'unable to load message found' });
+                        res.status(404).json({ 'error': 'unable to load piece found' });
                     }
                 },
             ],
-            function(destroyMessage) {
-                if (destroyMessage) {
-                    return res.status(201).json('message delete');
+            function(destroyPiece) {
+                if (destroyPiece) {
+                    return res.status(201).json('piece delete');
                 } else {
-                    return res.status(500).json({ 'error': 'cannot delete message' });
+                    return res.status(500).json({ 'error': 'cannot delete piece' });
                 }
             }
 
