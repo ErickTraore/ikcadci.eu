@@ -12,7 +12,6 @@ const util = require('util');
 // httpServer.listen(8080);
 // Constants
 const TITLE_LIMIT = 2;
-const CONTENT_LIMIT = 3;
 const ITEMS_LIMIT = 50;
 
 // Routes
@@ -25,13 +24,12 @@ module.exports = {
 
         // Params
         var title = req.body.title;
-        var content = req.body.content;
         var attachment = req.body.attachment;
-        if (title == null || content == null) {
+        if (title == null) {
             return res.status(400).json({ 'error': 'missing (null) parameters' });
         }
 
-        if (title.length <= TITLE_LIMIT || content.length <= CONTENT_LIMIT) {
+        if (title.length <= TITLE_LIMIT) {
             return res.status(400).json({ 'error': 'invalid (length) parameters' });
         }
 
@@ -52,10 +50,7 @@ module.exports = {
                 if (userFound) {
                     models.Piece.create({
                             title: title,
-                            content: content,
                             attachment: attachment || null,
-                            likes: 0,
-                            dislikes: 0,
                             UserId: userFound.id
                         })
                         .then(function(newPiece) {
@@ -74,36 +69,139 @@ module.exports = {
         });
     },
     listPieces: function(req, res) {
+        var headerAuth = req.headers['authorization'];
+        var userId = jwtUtils.getUserId(headerAuth);
+
         var fields = req.query.fields;
         var limit = parseInt(req.query.limit);
         var offset = parseInt(req.query.offset);
         var order = req.query.order;
-
+        console.log('Je suis un ANKEE')
+        console.log('userId-un', userId)
         if (limit > ITEMS_LIMIT) {
             limit = ITEMS_LIMIT;
         }
 
-        models.Piece.findAll({
-            order: [(order != null) ? order.split(':') : ['title', 'ASC']],
-            attributes: (fields !== '*' && fields != null) ? fields.split(',') : null,
-            limit: (!isNaN(limit)) ? limit : null,
-            offset: (!isNaN(offset)) ? offset : null,
-            include: [{
-                model: models.User,
-                attributes: ['username', 'email']
-            }],
-            order: [
-                ['id', 'DESC']
+        asyncLib.waterfall([
+                function(done) {
+                    models.Piece.findAll({
+                        where: [{
+                            userId: userId
+                        }],
+                        order: [(order != null) ? order.split(':') : ['title', 'ASC']],
+                        attributes: (fields !== '*' && fields != null) ? fields.split(',') : null,
+                        limit: (!isNaN(limit)) ? limit : null,
+                        offset: (!isNaN(offset)) ? offset : null,
+                        include: [{
+                            model: models.User,
+                            attributes: ['id', 'username', 'lastname', 'email']
+                        }],
+                        order: [
+                            ['id', 'DESC']
+                        ],
+                    }).then(function(piecesFound) {
+                        done(piecesFound)
+                    }).catch(function(err) {
+                        res.status(500).json({ "error": "invalid fields" });
+                    });
+                }
             ],
-        }).then(function(pieces) {
-            if (pieces) {
-                res.status(200).json(pieces);
-            } else {
-                res.status(404).json({ "error": "no pieces found" });
+            function(piecesFound) {
+                if (piecesFound) {
+                    return res.status(201).json(piecesFound);
+                } else {
+                    return res.status(500).json({ 'error': 'cannot post message' });
+                }
+            });
+
+
+
+    },
+    listMyPieces: function(req, res) {
+        var headerAuth = req.headers['authorization'];
+        var userId = jwtUtils.getUserId(headerAuth);
+        if (userId <= 0) {
+            return res.status(400).json({ 'error': 'invalid user' });
+        }
+        asyncLib.waterfall([
+                function(done) {
+                    models.Piece.findAll({
+                        where: {
+                            userId: userId
+                        }
+                    }).then(function(piecesFound) {
+                        done(piecesFound)
+                    }).catch(function(err) {
+                        res.status(500).json({ "error": "invalid fields" });
+                    });
+
+                },
+            ],
+            function(piecesFound) {
+                if (piecesFound) {
+                    res.status(201).json(piecesFound);
+                } else {
+                    res.status(500).json({ 'error': 'cannot found pieces' });
+                }
             }
-        }).catch(function(err) {
-            res.status(500).json({ "error": "invalid fields" });
-        });
+
+        );
+    },
+    listFoundPieces: function(req, res) {
+        foundId = parseInt(req.params.pieceId);
+        console.log('XXXXXXXXXXXX', foundId);
+
+        var headerAuth = req.headers['authorization'];
+        var userId = jwtUtils.getUserId(headerAuth);
+
+        var fields = req.query.fields;
+        var limit = parseInt(req.query.limit);
+        var offset = parseInt(req.query.offset);
+        var order = req.query.order;
+        console.log('Je suis un ANKEE')
+        console.log('userId-un', userId)
+        if (limit > ITEMS_LIMIT) {
+            limit = ITEMS_LIMIT;
+        }
+
+        if (foundId <= 0) {
+            return res.status(400).json({ 'error': 'invalid user' });
+        }
+        asyncLib.waterfall([
+                function(done) {
+                    models.Piece.findAll({
+                        where: [{
+                            userId: foundId
+                        }],
+                        order: [(order != null) ? order.split(':') : ['title', 'ASC']],
+                        attributes: (fields !== '*' && fields != null) ? fields.split(',') : null,
+                        limit: (!isNaN(limit)) ? limit : null,
+                        offset: (!isNaN(offset)) ? offset : null,
+                        include: [{
+                            model: models.User,
+                            attributes: ['id', 'username', 'lastname', 'email']
+                        }],
+                        order: [
+                            ['id', 'DESC']
+                        ],
+
+                    }).then(function(piecesFound) {
+                        done(piecesFound)
+                    }).catch(function(err) {
+                        res.status(500).json({ "error": "invalid fields" });
+                    });
+
+                },
+            ],
+            function(piecesFound) {
+                if (piecesFound) {
+                    res.status(201).json(piecesFound);
+                } else {
+                    res.status(500).json({ 'error': 'cannot found pieces' });
+                }
+            }
+
+        );
     },
     listPiecesAdmin: function(req, res) {
         var fields = req.query.fields;
@@ -191,18 +289,9 @@ module.exports = {
                     console.log('pieceLive.UserId :', pieceLive)
                     console.log('userId', userId)
                     console.log('pieceLive.UserId :', pieceLive.UserId)
-                    console.log('pieceLive.Likes :', pieceLive.likes)
-                    console.log('pieceLive.Dislikes :', pieceLive.dislikes)
                     console.log('pieceLive.id :', pieceId)
                     if (pieceLive.UserId = userId) {
-                        pieceLive.update({
-                            likes: pieceLive.likes * 0,
-                            dislikes: pieceLive.dislike * 0,
-                        }).then(function() {
-                            done(pieceLive);
-                        }).catch(function(err) {
-                            res.status(500).json({ 'error': 'cannot update likes=0 and dislike=0' });
-                        });
+
 
                         models.Piece.destroy({
                                 where: {
@@ -210,7 +299,6 @@ module.exports = {
                                 }
                             })
                             .then(function(destroyPiece) {
-                                // return res.status(200).json({ deleteLikeLive });
                                 done(destroyPiece)
                             })
                             .catch(function(error) {
@@ -290,7 +378,6 @@ module.exports = {
                                 }
                             })
                             .then(function(destroyPiece) {
-                                // return res.status(200).json({ deleteLikeLive });
                                 done(destroyPiece)
                             })
                             .catch(function(error) {
@@ -322,7 +409,8 @@ module.exports = {
         var size = file.data.length;
         var extension = path.extname(fileName);
 
-        var allowedExtensions = /png|jpeg|jpg|gif/;
+        var allowedExtensions = /png|jpeg|jpg|pdf|gif/;
+
         const md5 = file.md5;
         const URL = "/images/" + md5 + extension;
         const idImage = md5 + extension;
@@ -347,28 +435,36 @@ module.exports = {
 
     },
     delLienImage: function(req, res) {
-        var file = req.files.file;
-        var fileName = file.name;
-        console.log('UN YANKEE');
-        console.log('fileName ligne 187:', fileName);
-        var size = file.data.length;
-        var extension = path.extname(fileName);
+        try {
+            var file = req.files.file;
+            var fileName = file.name;
+            var size = file.data.length;
+            var extension = path.extname(fileName);
 
-        var allowedExtensions = /png|jpeg|jpg|gif/;
-        const md5 = file.md5;
-        const URL = "/images/" + md5 + extension;
-        const idImage = md5 + extension;
-        console.log(URL);
-        console.log(idImage);
-        const chemin = idImage;
-        console.log('chemin', chemin);
-        fs.unlink("./public/images/" + idImage, (err) => {
-            if (err) {
-                console.error(err)
-                return
-            }
+            var allowedExtensions = /png|jpeg|jpg|pdf|gif/;
+            const md5 = file.md5;
+            const URL = "/images/" + md5 + extension;
+            const idImage = md5 + extension;
+            const chemin = idImage;
 
+        } catch {
+            return err.statusCode = 401;
 
-        });
+        }
+        try {
+
+            fs.unlink("./public/images/" + idImage, (err) => {
+                if (err) {
+                    return res.status(200).json(this.pieces);
+                } else {
+                    return err.statusCode = 401;
+                }
+            });
+
+        } catch {
+            return err.statusCode = 401;
+
+        }
+
     }
 }

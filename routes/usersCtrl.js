@@ -58,7 +58,7 @@ module.exports = {
         if (password == null) {
             return res.status(400).json({ 'error': 'password missing parameters' });
         }
-        if (username.length >= 13 || username.length <= 3) {
+        if (username.length >= 21 || username.length <= 3) {
             return res.status(400).json({ 'error': 'wrong username (must be length 5 - 12)' });
         }
 

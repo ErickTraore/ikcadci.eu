@@ -14,10 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     }
     Piece.init({
         title: DataTypes.STRING,
-        content: DataTypes.STRING,
         attachment: DataTypes.STRING,
-        likes: DataTypes.INTEGER,
-        dislikes: DataTypes.INTEGER,
     }, {
         sequelize,
         modelName: 'Piece',

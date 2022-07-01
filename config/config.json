@@ -14,7 +14,7 @@
         "dialect": "mysql"
     },
     "production": {
-        "username": "root",
+    "username": "root",
         "password": "72jE_b_Bqi",
         "database": "ikcadci_production",
         "host": "127.0.0.1",

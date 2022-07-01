@@ -2,6 +2,7 @@
 const express = require('express');
 const usersCtrl = require('./routes/usersCtrl');
 const messagesCtrl = require('./routes/messagesCtrl');
+const studentsCtrl = require('./routes/studentsCtrl');
 const formationsCtrl = require('./routes/formationsCtrl');
 const inscriptionsCtrl = require('./routes/inscriptionsCtrl');
 const likesCtrl = require('./routes/likesCtrl');
@@ -44,13 +45,21 @@ exports.router = (function() {
         router.post('/inscriptions/new/', inscriptionsCtrl.createInscription);
         router.get('/listInscriptions/list/', inscriptionsCtrl.listInscriptions);
 
-        router.get('/piece/', piecesCtrl.listPieces);
+        router.get('/piece/', auth, piecesCtrl.listPieces);
         router.post('/piece/new/', piecesCtrl.createPiece);
         router.post('/piece/upload', piecesCtrl.uploadImage);
         router.post('/piece/:pieceId/del', piecesCtrl.delPiecePost);
+        router.get('/piece/:pieceId/found/', piecesCtrl.listFoundPieces);
+        router.post("/piece/delLienImage", messagesCtrl.delLienImage);
 
+        router.post('/student/new/', studentsCtrl.createStudent);
+        router.get('/students/:studentId/seen/', studentsCtrl.listOneStudents);
+        router.get('/students/', auth, studentsCtrl.listStudents);
+
+        router.post('/student/:studentId/goMailer/', studentsCtrl.goMailer);
+        router.post('/student/nodeMailer/', studentsCtrl.theMailer);
+        router.post('/student/contactMailer/', studentsCtrl.contactMailer);
 
         return router;
-
     })
     ();

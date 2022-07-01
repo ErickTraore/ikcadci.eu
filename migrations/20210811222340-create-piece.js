@@ -20,21 +20,10 @@ module.exports = {
                 allowNull: false,
                 type: Sequelize.STRING
             },
-            content: {
-                allowNull: false,
-                type: Sequelize.STRING
-            },
+
             attachment: {
                 allowNull: true,
                 type: Sequelize.STRING
-            },
-            likes: {
-                allowNull: true,
-                type: Sequelize.INTEGER
-            },
-            dislikes: {
-                allowNull: true,
-                type: Sequelize.INTEGER
             },
             createdAt: {
                 allowNull: false,

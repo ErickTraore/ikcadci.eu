@@ -1,9 +1,13 @@
 //imports
+
+var dotenv = require('dotenv').config();
 var http = require('http');
 var express = require('express');
 var bodyParser = require('body-parser');
 var apiRouter = require('./apiRouter').router;
 var server = express();
+var nodemailer = require('nodemailer');
+var hbs = require('nodemailer-express-handlebars');
 var req = require('request');
 
 var fs = require('fs');
@@ -14,6 +18,9 @@ var credentials = { key: privateKey, cert: certificate };
 var httpServer = http.createServer(server);
 var httpsServer = https.createServer(credentials, server);
 
+// var exphbs = require('express-hbs');
+// hbs.registerHelper('helper_name', function(options) { return 'helper value'; });
+// hbs.registerPartial('partial_name', 'partial value');
 
 //instantiation
 server.use((req, res, next) => {
@@ -83,9 +90,11 @@ server.get('/', function(req, res) {
     res.status(200).send('<h1>Bonjour sur notre super server</h1>');
 
 });
+
 server.use(express.static('public'));
 
 server.use('/api/', apiRouter);
+server.set('view engine', 'hbs');
 
 httpServer.listen(3001, function() {
     console.log('Server en écoute sur http:');

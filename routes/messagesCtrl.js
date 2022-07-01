@@ -235,10 +235,11 @@ module.exports = {
                 },
             ],
             function(destroyMessage) {
-                if (destroyMessage) {
-                    return res.status(201).json('message delete');
+                if (!destroyMessage) {
+                    return res.status(200).json({ 'error': 'Message delete' });
+
                 } else {
-                    return res.status(500).json({ 'error': 'cannot delete message' });
+                    return res.status(501).json('cannot destroy message');
                 }
             }
 
@@ -333,7 +334,7 @@ module.exports = {
         var size = file.data.length;
         var extension = path.extname(fileName);
 
-        var allowedExtensions = /png|jpeg|jpg|gif/;
+        var allowedExtensions = /png|jpeg|jpg|pdf|gif/;
         const md5 = file.md5;
         const URL = "/images/" + md5 + extension;
         const idImage = md5 + extension;
